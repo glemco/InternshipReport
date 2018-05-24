@@ -1,0 +1,30 @@
+\documentclass{article}
+\usepackage[left=1.5cm,right=1.5cm,top=2.5cm,bottom=2cm]{geometry}
+\usepackage{xcolor}
+\usepackage{graphics}
+\graphicspath{{./images/}}
+
+\title{Report di tirocinio}
+\author{Gabriele Monaco}
+
+\renewcommand*\contentsname{Indice}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\tableofcontents
+
+\setlength{\parindent}{0pt}
+
+\newpage
+\section{GESTIONE NEGOZIO CON STM32F429ZI}
+\input{project.tex}
+
+\newpage
+\section{CHANGELOG DEI PROGETTI}
+\input{./changelog.tex}
+
+\end{document}
