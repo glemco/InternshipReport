@@ -1,16 +1,13 @@
-\documentclass{article}
+\documentclass[a4paper,12pt]{article}
 \usepackage[left=1.5cm,right=1.5cm,top=2cm,bottom=2cm]{geometry}
 \usepackage[italian]{babel}
 \usepackage[hidelinks]{hyperref}
-\usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}
 \usepackage{graphicx}
 \graphicspath{{./images/}}
 
 \title{Report di tirocinio}
 \author{Gabriele Monaco}
-
-%\renewcommand*\contentsname{Indice}
-%\renewcommand*\figurename{Figura}
 
 \begin{document}
 
@@ -21,6 +18,8 @@
 \tableofcontents
 
 \setlength{\parindent}{0pt}
+
+\newcommand{\textdesc}[1]{\textsf{\color{teal}#1}}
 
 \newpage
 \section{GESTIONE NEGOZIO CON STM32F429ZI}
