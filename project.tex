@@ -54,6 +54,10 @@ Dopo le inizializzazioni di hardware e dati (ancora da definire) il sistema entr
 
 \subsection{COLLEGAMENTO BLUETOOTH STM32F429ZI}
 
+\subsubsection{Funzionamento delle librerie}
+
+Le librerie per la gestione del BLE (Bluetooth Low Energy), utilizzano i servizi gap, per quanto riguarda l'apertura/chiusura della connessione, e gatt, per lettura/scrittura e altre funzionalit\`a. In entrambi i casi il paradigma utilizzato \`e quello callback, cos\`i le chiamate a funzione lanciano richieste all'estensione bluetooth e quando queste ricevono risposta, un interrupt viene generato e la funzione \texttt{HCI\_Event\_CB()} viene chiamata con argomento il puntatore all'evento (una struct che contiene i dati necessari), in base al tipo di tale evento viene eseguita l'azione corrispondente.
+
 \subsubsection{Comunicazione come client BLE}
 
 \textdesc{funzione \textit{BLE\_Process} e files \textit{Src/sensor\_service.c}, \textit{Inc/sensor\_service.h}}
@@ -70,7 +74,11 @@ Il led blu (LD2) viene attivato all'inizio della comunicazione con la prima vetr
 
 \subsubsection{Crittografia con protocolli TLS/HTTPS}
 
-Per migliorare la sicurezza della comunicazione, il sistema implementa la libreria di cifratura \texttt{mbedtls.h} (selezionabile da STMcube), abbastanza leggera per poter svolgere il suo lavoro con poche risorse e abbastanza avanzata nei metodi e protocolli. La comunicazione HTTP viene dunque 'filtrata' attraverso questa libreria, che la rende dunque accessibile solo a server e client. Durante la procedura di handshake, entrambi gli attori concordano un metodo di cifratura (vengono supportate ciphersuite con \texttt{ECHDE} e certificati \texttt{RSA} o \texttt{ECDSA}, che dovranno essere implementati sul server) e il certificato del server viene controllato (non ne sono stati utilizzati lato client). La scheda \`e in grado di autorizzare certificati self signed solo se il certificato della CA \`e salvato all'interno del firmware (come stringa in \texttt{srv\_cert.c}, \textbf{TODO} implementare un filesystem e caricare l\`i il certificato).
+Per migliorare la sicurezza della comunicazione, il sistema implementa la libreria di cifratura \texttt{mbedtls.h} (selezionabile da STMcube), abbastanza leggera per poter svolgere il suo lavoro con poche risorse e abbastanza avanzata nei metodi e protocolli. La comunicazione HTTP viene dunque `filtrata' attraverso questa libreria, che la rende dunque accessibile solo a server e client. Durante la procedura di handshake, entrambi gli attori concordano un metodo di cifratura (vengono supportate ciphersuite con \texttt{ECHDE} e certificati \texttt{RSA} o \texttt{ECDSA}, che dovranno essere implementati sul server) e il certificato del server viene controllato (non ne sono stati utilizzati lato client). La scheda \`e in grado di autorizzare certificati self signed solo se il certificato della CA \`e salvato all'interno del firmware (come stringa in \texttt{srv\_cert.c}, \textbf{TODO} implementare un filesystem e caricare l\`i il certificato).
+
+\subsubsection{Funzionamento delle librerie}
+
+La connessione ad internet della board atraverso le librerie mbedtls \`e effettuata esclusivamente con chiamate procedurali, dunque l'esecuzione \`e il pi\`u possibile consecutiva. Durante l'inizializzazione, vengono impostati i parametri generali necessari alla crittografia (numeri casuali, certificati e varie configurazioni), questo capita solamente quando la scheda viene accesa. Ad ogni esecuzione la connessione viene aperta, la funzione di connessione crea un nuovo socket ed inizia la connessione al server tramite quella struttura, utilizzando le configurazioni tls precedentemente impostate, questo inizia la procedura di handshake (accordi riguardo autenticazioni e crittografia) con il server. Ogni comunicazione avviene tramite normali richieste http criptate secondo i criteri stabiliti durante l'handshake, in maniera analoga vengono ricevute e gestite le risposte. Al termine della procedura la connessione e il relativo socket vengono chiusi.
 
 \subsubsection{Comunicazione come client web}
 
