@@ -1,93 +1,109 @@
 v1.0.0 \textit{eth\_test}
 	\begin{itemize}
-	\item Comunicazione http configurata con api \texttt{netconn.h}
-	\item Aggiunto ritardo per acquisizione ip con dhcp
+		\item Comunicazione http configurata con api \texttt{netconn.h}
+		\item Aggiunto ritardo per acquisizione ip con dhcp
 	\end{itemize}
 v1.0.1 \textit{eth\_test}
 	\begin{itemize}
-	\item Aggiunta di funzioni per inviare richieste e gestire la risposta
-	\item Implementazione del metodo POST nelle richieste
-	\item Introduzione delle strutture per il database locale
-	\item Formato testuale nel pacchetto in entrata (problemi con scanf e uint8)
+		\item Aggiunta di funzioni per inviare richieste e gestire la risposta
+		\item Implementazione del metodo POST nelle richieste
+		\item Introduzione delle strutture per il database locale
+		\item Formato testuale nel pacchetto in entrata (problemi con scanf e uint8)
 	\end{itemize}
 v1.0.2 \textit{eth\_test}
 	\begin{itemize}
-	\item Aggiunta delle strutture \texttt{shadow\_} per gestire i dati durante il fetch
-	\item Chiusura della connessione dopo ogni trasmissione (limitazione di netconn)
-	\item Separazione in thread diverse (coordinate da semafori) per distribuire la memoria
+		\item Aggiunta delle strutture \texttt{shadow\_} per gestire i dati durante il fetch
+		\item Chiusura della connessione dopo ogni trasmissione (limitazione di netconn)
+		\item Separazione in thread diverse (coordinate da semafori) per distribuire la memoria
 	\end{itemize}
 v1.0.3 \textit{eth\_test}
 	\begin{itemize}
-	\item Migrazione alla api \texttt{socket.h} per poter trasmettere pi\`{u} pacchetti nella stessa connessione
-	\item Aggiunto calcolo del checksum 
-	\item Ritrasmissione dei pacchetti su errore (checksum)
+		\item Migrazione alla api \texttt{socket.h} per poter trasmettere pi\`{u} pacchetti nella stessa connessione
+		\item Aggiunto calcolo del checksum 
+		\item Ritrasmissione dei pacchetti su errore (checksum)
 	\end{itemize}
 v1.1.0 \textit{eth\_test}
 	\begin{itemize}
-	\item Aggiunta del supporto a mbedTLS, importato da STM32Cube
-	\item Inizia il passaggio a HTTPS (http criptato)
-	\item Errori nella procedura di handshake con il server
+		\item Aggiunta del supporto a mbedTLS, importato da STM32Cube
+		\item Inizia il passaggio a HTTPS (http criptato)
+		\item Errori nella procedura di handshake con il server
 	\end{itemize}
 v1.0.4 \textit{eth\_test}
 	\begin{itemize}
-	\item Aggiunta del supporto alle ciphersuite con RSA per una migliore compatibilit\`{a}
-	\item Ridimensionata il numero di MPI per gestire le chiavi RSA
-	\item Risolti problemi sull'handshake, da installare il certificato sul dispositivo
+		\item Aggiunta del supporto alle ciphersuite con RSA per una migliore compatibilit\`{a}
+		\item Ridimensionata il numero di MPI per gestire le chiavi RSA
+		\item Risolti problemi sull'handshake, da installare il certificato sul dispositivo
 	\end{itemize}
 v1.0.5 \textit{eth\_test}
 	\begin{itemize}
-	\item Installato il certificato in una sorgente a parte (\texttt{srv\_cert.c})
-	\item La connessione si apre e si chiude correttamente
+		\item Installato il certificato in una sorgente a parte (\texttt{srv\_cert.c})
+		\item La connessione si apre e si chiude correttamente
 	\end{itemize}
 v1.0.0 \textit{bl\_merge}
 	\begin{itemize}
-	\item Porting da sensor-demo per stm32f401
-	\item Adattati i nomi dei pin
+		\item Porting da sensor-demo per stm32f401
+		\item Adattati i nomi dei pin
 	\end{itemize}
 v1.0.1 \textit{bl\_merge}
 	\begin{itemize}
-	\item Risolti i problemi di spi configurando il pin SPI\_IRQ del BNRG come EXTI (EXTeral Interrupt)
-	\item Impostazione come client ble (originariamente server)
+		\item Risolti i problemi di spi configurando il pin SPI\_IRQ del BNRG come EXTI (EXTeral Interrupt)
+		\item Impostazione come client ble (originariamente server)
 	\end{itemize}
 v1.1.0 \textit{bl\_merge}
 	\begin{itemize}
-	\item Comunicazione con server ble funzionante
-	\item Definizione della data come struct
+		\item Comunicazione con server ble funzionante
+		\item Definizione della data come struct
 	\end{itemize}
 v1.1.0 \textit{bl\_merge}
 	\begin{itemize}
-	\item Aggiunto supporto per connettersi a pi\`{u} dispositivi (array contenente tutti gli indirizzi)
-	\item Aggiunta del timeout per la connessione
+		\item Aggiunto supporto per connettersi a pi\`{u} dispositivi (array contenente tutti gli indirizzi)
+		\item Aggiunta del timeout per la connessione
 	\end{itemize}
 
 \textbf{unione tra i progetti \textit{eth\_test} e \textit{bl\_merge} nel nuovo progetto \textit{shop429}}
 
 v1.2.0 \textit{shop429}
 	\begin{itemize}
-	\item Merge dei progetti su eth e ble
-	\item Particolare attenzione alle librerie come \texttt{Inc/stm32f4xx\_it} per il corretto funzionamento del ble
+		\item Merge dei progetti su eth e ble
+		\item Particolare attenzione alle librerie come \texttt{Inc/stm32f4xx\_it} per il corretto funzionamento del ble
 	\end{itemize}
 v1.2.1 \textit{shop429}
 	\begin{itemize}
-	\item Implementazione della macchina a stati anche per la connettivit\`{a} web (\texttt{ETH\_Process()})
-	\item Funzione richiamata ad ogni passaggio, necessario l'uso di variabili statiche
-	\item Riunione in singola thread del processo di eth rimuovendo i semafori
-	\item La versione del database locale viene aggiornata soltanto dopo il fetch completo della tabella
+		\item Implementazione della macchina a stati anche per la connettivit\`{a} web (\texttt{ETH\_Process()})
+		\item Funzione richiamata ad ogni passaggio, necessario l'uso di variabili statiche
+		\item Riunione in singola thread del processo di eth rimuovendo i semafori
+		\item La versione del database locale viene aggiornata soltanto dopo il fetch completo della tabella
 	\end{itemize}
 v1.2.2 \textit{shop429}
 	\begin{itemize}
-	\item Risolti problemi della macchina a stati ble aggiornando lo stato in base a quello vecchio quando ricominciano le vetrine
-	\item Implementazione della scrittura su server (eth) in formato testuale
+		\item Risolti problemi della macchina a stati ble aggiornando lo stato in base a quello vecchio quando ricominciano le vetrine
+		\item Implementazione della scrittura su server (eth) in formato testuale
 	\end{itemize}
 v1.2.3 \textit{shop429}
 	\begin{itemize}
-	\item Uso parziale della variabile locale di stato del negozio
-	\item PRINTF configurato per il debug (SWV console)
-	\item Ora viene gestita la disconnessione bluetooth anche dall'altro dispositivo
+		\item Uso parziale della variabile locale di stato del negozio
+		\item PRINTF configurato per il debug (SWV console)
+		\item Ora viene gestita la disconnessione bluetooth anche dall'altro dispositivo
 	\end{itemize}
 v1.2.4 \textit{shop429}
 	\begin{itemize}
-	\item Uso del formato binario nelle connessioni al server web
-	\item Inclusa l'autenticazione al server nell'header http
-	\item Connessione con database reale sul server (sorgenti php incluse nel progetto)
+		\item Uso del formato binario nelle connessioni al server web
+		\item Inclusa l'autenticazione al server nell'header http
+		\item Connessione con database reale sul server (sorgenti php incluse nel progetto)
 	\end{itemize}
+v1.2.5 \textit{shop429}
+  \begin{itemize}
+  	\item
+  \end{itemize}
+v1.2.6 \textit{shop429}
+  \begin{itemize}
+  	\item
+  \end{itemize}
+v1.2.7 \textit{shop429}
+  \begin{itemize}
+  	\item
+  \end{itemize}
+v1.2.8 \textit{shop429}
+  \begin{itemize}
+  	\item
+  \end{itemize}
