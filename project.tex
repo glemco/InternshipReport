@@ -64,6 +64,10 @@ Dopo le inizializzazioni di hardware e dati (ancora da definire) il sistema entr
   \caption{Schema della macchina a stati}
 \end{figure}
 
+\subsubsection{Aggiornamenti FOTA}
+
+Per poter apportare modifiche senza dover sempre intervenire fisicamente sulle schede, si \`e scelto di implementare l'aggiornamento Firmware Over The Air, ovvero il download del firmware tramite connettivit\`a (in questo caso ethernet, per le vetrine avverr\`a lo stesso con il bluetooth). Il firmware viene scritto in una zona inutilizzata della flash, che deve quindi essere abbastanza capiente per poter tenere entrambe le versioni, poi quando l'eseguibile \`e stato correttamente ricevuto, il dispositivo si riavvia. Appena acceso il dispositivo non esegue immediatamente l'applicazione, ma inizia dal bootloader (scritto all'inizio della memoria flash), questo controlla se \`e stato effettuato un aggiornamento e in caso positivo copia il contenuto della seconda partizione nella prima, sovrascrivendo dunque la vecchia versione. A questo punto l'applicazione che si trova nella prima partizione pu\`o essere eseguita.
+
 \subsection{COLLEGAMENTO BLUETOOTH STM32F429ZI}
 
 \subsubsection{Funzionamento delle librerie}
@@ -104,6 +108,12 @@ Le richieste HTTP utilizzano il metodo POST (la query string si trova dentro il 
 Ipotizzando che ogni vetrina contiene 17 bit con 2 bit aggiuntivi di checksum, un massimo di 50 vetrine possono essere scritte su pacchetti con corpo 1000 bit, che con buona probabilit\`a riempiono un singolo frame ethernet. I dati di accesso al database su server sono inclusi nell'header del pacchetto (sempre criptati).
 
 Quando una funzione di connessione ritorna un errore, il led rosso (LD3) si attiva, mentre il led blu (LD2) rimane attivo tra una trasmissione e una ricezione.
+
+\subsubsection{Scaricamento dal server del firmware}
+
+Il download del firmware viene fatto sempre tramite https, ma viste le notevoli dimensioni non pu\`o essere bufferizzato in ram e successivamente scritto in flash, d'altro canto un semplice download del file dal server potrebbe non funzionare comunque, anche a causa della ridotta velocit\`a di scrittura consentita sulla flash. Innanzitutto per come \`e configurata mbedTLS, i segmenti tcp hanno un limite di grandezza molto conservativo, utile per mantenere un ridotto utilizzo di RAM, ma problematico in questo caso. A tal proposito il valore di \texttt{SSL\_MAX\_CONTENT\_LEN} andrebbe allargato o disabilitato (di default \`e 2kB mentre il massimo \`e intorno ai 16kB ma tale valore introduce un notevole aumento di memoria utilizzata). 
+
+La velocit\`a della flash pu\`o anche dare problemi in quanto, durante il download, client e server continuano a negoziare la grandezza della finestra di ricezione (una sorta di buffer che va a limitare quanti dati possono essere ricevuti), ma per molto tempo questa rimane a 0 perch\'e la gestione dei dati ricevuti (possono superare i 5 kB) impiega talvolta troppo tempo, inducendo il server a terminare la connessione. Per ovviare a ci\`o e per tener traccia dei singoli pacchetti (facendo attenzione che contengano anche un numero intero di words per semplicit\`a), si \`e optato per una serie di query ad una pagina specifica (\texttt{fota\_update.php}) per richiedere ogni singolo pacchetto da 960B, in maniera progressiva.
 
 \subsection{NOTE}
 \begin{itemize}
