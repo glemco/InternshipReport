@@ -10,7 +10,32 @@ Il progetto \`e portato avanti sull'IDE \texttt{Atollic TrueStudio for STM32}, p
 
 Il debug pu\`o essere portato avanti con gdb sempre su Atollic, nella Perspective di debug appare anche una finestra con la console SWV dove, se abilitato tramite la flag \texttt{DEBUG} in \texttt{includes/debug.h}, appaiono i log lanciati con PRINTF. In alternativa pu\`o essere utilizzato il software \texttt{STMStudio} per tenere traccia del valore delle variabili durante l'esecuzione (non \`e possibile usare entrambi i metodi contemporaneamente).
 
+\subsubsection{Hardware impiegato}
+
+\textdesc{Figura \ref{fig:boards}}
+
+Questo progetto mira a scrivere un firmware per la board \texttt{STM32F429ZI Nucleo}, una scheda di sviluppo fornita dalla STM e basata su processore ARM Cortex-M4. La board presenta 144 pin utilizzabili per collegare altre periferiche note (tra cui quelle che soddisfano le specifiche ST morpho e Arduino R3) ed \`e costruita per poter essere assemblata con altre board simili in una pila avente i pin comunicanti. Il SoC supporta diverse periferiche tra cui diversi bus SPI e una presa ethernet (il connettore \`e presente sulla board).
+
+Per poter utilizzare la connettivit\`a bluetooth \`e necessario includere una estensione. In questo caso, \`e stata utilizzata la scheda \texttt{X-NUCLEO-IDB05A1}, un modulo che implementa la connettivit\`a BLE (Bluetooth Low Energy) e installabile sulle board di sviluppo STM32 utilizzando i connettori Arduino R3. A causa di sovrapposizione tra alcuni pin del processore, utilizzabili sia per ethernet che SPI, \`e stato necessario fare delle modifiche su entrambe le board per poterli spostare. Questo \`e stato facilmente ottenibile muovendo i relativi soulder bridge sulle schede.
+
+\begin{figure}[h]
+  \center
+  \begin{subfigure}{.45\textwidth}
+    \includegraphics[width=\textwidth]{st_nucleof429zi}
+    \caption{STM32F429ZI-NUCLEO}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{.45\textwidth}
+    \includegraphics[width=\textwidth]{x_nucleo_idb05a1}
+    \caption{X-NUCLEO-IDB05A1}
+  \end{subfigure}
+  \caption{Board di sviluppo ST}
+  \label{fig:boards}
+\end{figure}
+
 \subsubsection{Multithreading con FreeRTOS}
+
+Nel firmware \`e abilitata la funzionalit\`a di FreeRTOS (Real Time Operating System), una sorta di rudimentale sistema operativo in grado di gestire funzionalit\`a base di programmazione concorrenziale su dispositivi embedded. Supporta thread multiple e varie strutture per sincronizzare e gestire queste ultime, come semafori e timer. Per limitazioni di hardware (il processore \`e unico), le thread non possono essere realmente eseguite in parallelo, ma l'RTOS \`e in grado di alternare le esecuzioni delle varie thread quando queste vengono temporizzate. In pratica ogni thread \`e strutturata all'interno di una funzione contenente un loop infinito, all'interno di questo risiede l'effettivo codice da eseguire, al termine di questo viene chiamata la funzione \texttt{osDelay()}, che informa il sistema operativo che le risorse possono essere impiegate per un'altra thread in attesa e la precedente viene messa in coda per un numero di millisecondi passato come argomento della chiamata. Al termine di tale intervallo la thread potr\`a essere eseguita non appena il sistema sar\`a in grado di allocarle le risorse.
 
 Il progetto implementa le due connettivit\`a (ethernet e bluetooth) in thread separate, all'interno di queste viene eseguita un'azione tra INIT, READ, WRITE o END a seconda del valore della variabile \texttt{*\_state} (presente sia per eth che per ble), che permette di eseguire un operazione per ogni ciclo e passare all'attivit\`a successiva al termine di ciascuna. Una terza thread pu\`o innescare ciascuna trasmissione settando lo stato come INIT (ora viene gestito alla pressione del pulsante). Le funzioni che gestiscono le connettivit\`a \texttt{[ETH/BLE]\_Process()}, sono richiamate all'interno delle rispettive thread e vengono eseguite pi\`u volte, fino a terminare le loro mansioni.
 
@@ -73,7 +98,7 @@ Per poter apportare modifiche senza dover sempre intervenire fisicamente sulle s
 \subsubsection{Funzionamento delle librerie}
 
 Le librerie per la gestione del BLE (Bluetooth Low Energy), utilizzano i servizi gap, per quanto riguarda l'apertura/chiusura della connessione, e gatt, per lettura/scrittura e altre funzionalit\`a. In entrambi i casi il paradigma utilizzato \`e quello callback, cos\`i le chiamate a funzione lanciano richieste all'estensione bluetooth e quando queste ricevono risposta, un interrupt viene generato e la funzione \texttt{HCI\_Event\_CB()} viene chiamata con argomento il puntatore all'evento (una struct che contiene i dati necessari), in base al tipo di tale evento viene eseguita l'azione corrispondente. 
-Queste sorgenti sono fornite dalla ST come test per l'interfaccia BlueNRG utilizzando alcune delle schede a 64 pin, anche se l'estensione \`e compatibile in generale con i pin Arduino R3. In questo caso alcuni pin per il controllo del bus SPI sono stati spostati (cambiando posizione ai rispettivi soulder bridge) perch\'e interferivano con altre periferiche sulla board STM32.
+Queste sorgenti sono fornite dalla ST come test per l'interfaccia BlueNRG utilizzando alcune delle schede a 64 pin, anche se l'estensione \`e compatibile in generale con i pin Arduino R3, quindi con qualche modifica \`e stato possibile effettuare un porting. 
 
 \subsubsection{Comunicazione come client BLE}
 
