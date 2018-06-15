@@ -1,14 +1,14 @@
+\subsection*{}
+
 \subsubsection{Introduzione}
 
-\emph{All'interno di questo report user\`o sempre la terza persona, nonostante ci\`o questa parte di progetto \`e stata tenuta da me, dunque le varie implementazioni sono da considerarsi mie contribuzioni}
+\emph{All'interno di questo report user\`o sempre la terza persona, nonostante ci\`o questa parte di progetto \`e stata tenuta da me, dunque le varie implementazioni (qualora non siano librerie o specifiche richieste del cliente) sono da considerarsi mie contribuzioni}
 
 Con questo firmware si vuole implementare una parte del progetto \textit{Alterline}, che mira a fornire un controllo remoto delle colorazioni delle vetrine di un negozio, con possibilit\`a di essere esteso con nuove funzionalit\`a e di essere il pi\`u possibile automatizzato nella diagnosi degli errori. All'interno del negozio ogni vetrina avr\`a un led RGB, controllato con PWM da una schedina STM32, ognuna di queste schede sar\`a in contatto bluetooth con una scheda centrale (per cui questo firmware \`e pensato), unica per ogni negozio, che sar\`a a sua volta connessa via ethernet ad un server web, contenente il database utilizzato nel progetto.
 
-\subsubsection{Ambiente di sviluppo}
+Verranno utilizzati principalmente software e hardware prodotti dalla ST Microelectronics, azienda italo-francese specializzata nella produzione di dispositivi elettronici, principalmente utilizzati dello sviluppo di tecnologie embedded. STM32 \`e una famiglia di microcontrollori basati su processori ARM a 32 bit, la ST produce piattaforme hardware e software per poter sviluppare su questi dispositivi.
 
-Il progetto \`e portato avanti sull'IDE \texttt{Atollic TrueStudio for STM32}, partendo da un progetto generato dal software \texttt{STM32CubeMX}, per includere tutte le estensioni Driver e Middleware fornite da ST e poterle configurare in un'unica schermata. Per il controllo delle versioni si ricorre a \texttt{git}, direttamente accessibile da TrueStudio attraverso l'apposita estensione di Eclipse (su cui si basa il tool), \`e cos\`i possibile avere una traccia puntuale dei progressi (attraverso lo storico dei commit) ed \`e possibile creare pi\`u varianti di test del progetto (attraverso i branch).
-
-Il debug pu\`o essere portato avanti con gdb sempre su Atollic, nella Perspective di debug appare anche una finestra con la console SWV dove, se abilitato tramite la flag \texttt{DEBUG} in \texttt{includes/debug.h}, appaiono i log lanciati con PRINTF. In alternativa pu\`o essere utilizzato il software \texttt{STMStudio} per tenere traccia del valore delle variabili durante l'esecuzione (non \`e possibile usare entrambi i metodi contemporaneamente).
+Questo specifico progetto \`e nato inizialmente per la singola gestione della comunicazione via ethernet dei dati con il server (\texttt{eth\_test}), successivamente \`e stata implementata in maniera separata la funzionalit\`a bluetooth (\texttt{bl\_merge}) e infine le due sezioni sono state unite per comporre il progetto come lo si trova al momento della stesura di questo documento (\texttt{shop429}). Uno storico delle varie modifiche pu\`o essere consultato nella sezione \textit{CHANGELOG} del documento, questa ripercorre quasi completamente i commit effettuati sulle repository git dei diversi progetti, divisi opportunamente tra versioni in base all'entit\`a delle modifiche.
 
 \subsubsection{Hardware impiegato}
 
@@ -18,7 +18,9 @@ Questo progetto mira a scrivere un firmware per la board \texttt{STM32F429ZI Nuc
 
 Per poter utilizzare la connettivit\`a bluetooth \`e necessario includere una estensione. In questo caso, \`e stata utilizzata la scheda \texttt{X-NUCLEO-IDB05A1}, un modulo che implementa la connettivit\`a BLE (Bluetooth Low Energy) e installabile sulle board di sviluppo STM32 utilizzando i connettori Arduino R3. A causa di sovrapposizione tra alcuni pin del processore, utilizzabili sia per ethernet che SPI, \`e stato necessario fare delle modifiche su entrambe le board per poterli spostare. Questo \`e stato facilmente ottenibile muovendo i relativi soulder bridge sulle schede.
 
-\begin{figure}[h]
+Le board di sviluppo STM32 (tra cui quella utilizzata) contengono l'interfaccia ST-Link per agevolare la connessione e l'interazione della scheda con il PC, questa sezione contiene l'hardware necessario per permettere programmazione e debug del microcontrollore e pu\`o essere collegata con un cavetto micro-USB (in alternativa \`e possibile configurare l'UART). Tale estensione pu\`o essere rimossa, se necessario, o collegata ad altre schede per poterle programmare.
+
+\begin{figure}[ht]
   \center
   \begin{subfigure}{.45\textwidth}
     \includegraphics[width=\textwidth]{st_nucleof429zi}
@@ -32,6 +34,18 @@ Per poter utilizzare la connettivit\`a bluetooth \`e necessario includere una es
   \caption{Board di sviluppo ST}
   \label{fig:boards}
 \end{figure}
+
+\subsubsection{Ambiente di sviluppo}
+
+Il progetto \`e portato avanti sull'IDE \texttt{Atollic TrueStudio for STM32}, toolchain basata su Eclipse che usa i tool di compilazione e debug GNU (gcc e gdb) recentemente acquisita dalla ST stessa (\`e stata utilizzata la versione 9.0.0).
+
+Si \`e partiti da un progetto generato dal software \texttt{STM32CubeMX}, in grado di generare progetti per le varie toolchain contenenti tutte le estensioni Driver e Middleware fornite da ST, impostando i valori specifici per ogni board o SoC. Vengono generate anche le varie inizializzazioni di periferiche e software aggiuntivi e quasi tutti i parametri possono essere direttamente configurati dalle apposite schermate del tool (\`e stata utilizzata la versione 4.25.1).
+
+Per il controllo delle versioni si ricorre a \texttt{git}, direttamente accessibile da TrueStudio attraverso l'apposita estensione di Eclipse (su cui si basa il tool), \`e cos\`i possibile avere una traccia puntuale dei progressi (attraverso lo storico dei commit) ed \`e possibile creare pi\`u varianti di test del progetto (attraverso i branch).
+
+Il debug pu\`o essere portato avanti con gdb sempre su Atollic, nella Perspective di debug appare anche una finestra con la console SWV dove, se abilitato tramite la flag \texttt{DEBUG} in \texttt{includes/debug.h} (definita tra le sorgenti BlueNRG), appaiono i log lanciati con PRINTF. In alternativa pu\`o essere utilizzato il software \texttt{STMStudio} per tenere traccia del valore delle variabili durante l'esecuzione (non \`e possibile usare entrambi i metodi contemporaneamente).
+
+Nonostante la programmazione del firmware in flash (in formato ELF) avvenga direttamente in fase di debug utilizzando Atollic, esiste anche il tool \texttt{STM32Programmer}, utile per gestire direttamente la flash con operazioni come lettura e scrittura. Con questo software si pu\`o dunque programmare la scheda a partire dall'area di memoria specifica e utilizzando diversi formati (utile se si utilizza un bootloader all'inizio della flash e per avere un eseguibile con dimensioni pi\`u contenute) oppure leggere specifiche aree di memoria che possono essere state programmate dalla board stessa (eeprom simulata o download del firmware).
 
 \subsubsection{Multithreading con FreeRTOS}
 
@@ -61,7 +75,7 @@ Le funzioni di trasferimento hanno nomi del tipo \texttt{[get/set][Shop/Entry][E
 
 Le variabili che fanno parte del database contengono i valori iniziali che verranno usati prima del fetch (e qualora questo non andasse a buon fine), i valori del negozio sono settati come default (definite attraverso costanti) mentre quelli delle vetrine sono tutti nulli fatta eccezione per alcuni id della tabella che diventer\`a \texttt{active\_} che conterr\`a le vetrine 1, 2 e 3. Durante la procedura di inizializzazione del database, viene controllata anche la eeprom e vengono acquisiti gli eventuali dati, solo se coerenti. La procedura \`e simile a quella effettuata per la ricezione da \textit{ETH}, in cui le tabelle \texttt{shadow\_} vengono popolate e successivamente attivate se il checksum corrisponde (o in generale il dato letto ha senso). Le funzioni \texttt{Activate*} utilizzate a tal proposito, salvano anche i dati ricevuti sulla eeprom se questa funzione \`e abilitata (cosa che capita in ricezione dal server e chiaramente non dopo la lettura dalla stessa eeprom).
 
-\begin{figure}[h!]
+\begin{figure}[ht]
 	\includegraphics[width=\textwidth]{structures}
   \caption{Struttura del database locale}
 \end{figure}
@@ -84,7 +98,7 @@ All'interno degli script php per la gestione del database sono utilizzati dei pr
 
 Dopo le inizializzazioni di hardware e dati (ancora da definire) il sistema entra in funzione e periodicamente aggiorna i dati (ora questo avviene con la pressione del pulsante). Prima, se necessario (\textbf{TODO} da definire) la data viene sincronizzata (\textit{eth}), successivamente parte il fetch dei dati dal server (\textit{eth}), prima i dati del negozio e poi delle vetrine. Questo processo viene saltato qualora la versione locale sia aggiornata, quando questo arriva al termine parte la scrittura dei nuovi dati su ciascuna vetrina (\textit{ble}), successivamente si pu\`o procedere con la lettura dei dati attivi (\textit{ble}) e la risposta al server con questi dati (\textit{eth}), (si pu\`o mettere in parallelo la comunicazione in entrata e in uscita dal server purch\'e non si utilizzi contemporaneamente la stessa interfaccia, \textit{ble} o \textit{eth}, quando finisce dunque la lettura da entrambi i lati si pu\`o passare alla scrittura). Le definizioni di questi processi avvengono nelle funzioni \texttt{[BLE,ETH]\_Process()}, quando lo stato diventa INIT comincia la connessione, ad ogni esecuzione viene eseguita l'operazione indicata (READ/WRITE/SYNC) e se questa va a buon fine, si passa alla successiva, altrimenti in base all problema riscontrato si ripete il procedimento o si termina il servizio (stato END). (\textbf{TODO} implementare una trasmissione delle informazioni sugli errori al server utilizzando lo stato in \texttt{running\_shop}). 
 
-\begin{figure}[h!]
+\begin{figure}[ht]
 	\includegraphics[width=\textwidth]{state_machine}
   \caption{Schema della macchina a stati}
 \end{figure}
