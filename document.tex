@@ -1,6 +1,6 @@
 \documentclass[a4paper,12pt]{article}
 
-\usepackage[left=1.5cm,right=1.5cm,top=2cm,bottom=2cm]{geometry}
+\usepackage[left=1.5cm,right=1.5cm,top=2.5cm,bottom=2.5cm]{geometry}
 \usepackage[italian]{babel}
 \usepackage[T1]{fontenc}
 \usepackage[hidelinks]{hyperref}
@@ -27,11 +27,25 @@
 \newcommand{\textdesc}[1]{\textsf{\color{teal}#1}}
 
 \newpage
+
+\begin{em}
+
+  \subsection{Note sulla relazione}
+
+  All'interno di questo report user\`o sempre la terza persona, nonostante ci\`o questa parte di progetto \`e stata tenuta da me, dunque le varie implementazioni (qualora non siano librerie o specifiche richieste del cliente) sono da considerarsi mie contribuzioni
+
+  Spesso per trattare di strutture dati, variabili o funzioni con parti del nome in comune, verranno usate alcune wildcards, ad esempio quando si parla di vetrine e negozio, le variabili \textup{\texttt{foo\_*}} saranno \textup{\texttt{foo\_vetrine}} e \textup{\texttt{foo\_shop}}, in maniera analoga dove questo pu\`o non essere facilmente deducibile vengono usati metodi del tipo \textup{\texttt{[foo/bar][Eth/Ble]}} che stanno ad indicare tutte le combinazioni possibili cambiando le parole tra le \textup{\texttt{[ ]}} (quindi in questo caso ci si riferisce a \textup{\texttt{fooEth}},\textup{\texttt{fooBle}},\textup{\texttt{barEth}},\textup{\texttt{barBle}}). In ogni caso queste notazioni vengono utilizzate per esprimere identificatori presenti nel codice, \`e dunque immediata la comprensione quando si ha accesso alla sorgente e comunque non viene preclusa la comprensione dei ragionamenti espressi in caso contrario.
+
+\end{em}
+
 \section{GESTIONE NEGOZIO CON STM32F429ZI}
+
 \input{project.tex}
 
 \newpage
+
 \section{CHANGELOG DEI PROGETTI}
+
 \input{./changelog.tex}
 
 \end{document}

@@ -1,3 +1,5 @@
+\subsection*{eth\_test}
+
 \paragraph{v1.0.0 \textit{eth\_test}}
 	\begin{itemize}
 		\item Comunicazione http configurata con api \texttt{netconn.h}
@@ -39,6 +41,9 @@
 		\item Installato il certificato in una sorgente a parte (\texttt{srv\_cert.c})
 		\item La connessione si apre e si chiude correttamente
 	\end{itemize}
+
+\subsection*{ble\_merge}
+
 \paragraph{v1.0.0 \textit{bl\_merge}}
 	\begin{itemize}
 		\item Porting da sensor-demo per stm32f401
@@ -61,6 +66,8 @@
 	\end{itemize}
 
 \textbf{unione tra i progetti \textit{eth\_test} e \textit{bl\_merge} nel nuovo progetto \textit{shop429}}
+
+\subsection*{shop429}
 
 \paragraph{v1.2.0 \textit{shop429}}
 	\begin{itemize}
@@ -105,15 +112,22 @@
   \end{itemize}
 \paragraph{v1.3.1 \textit{shop429}}
   \begin{itemize}
-  	\item
+  	\item Inizio implementazione del download del firmware via ETH, problemi con pacchetti grandi
+    \item Rimosso limite \texttt{SSL\_MAX\_CONTENT\_LEN}, la connessione va in timeout durante il flash
   \end{itemize}
 \paragraph{v1.3.2 \textit{shop429}}
   \begin{itemize}
-  	\item
+    \item Utilizzo di richieste separate al server per ottenere le varie sezioni del file
   \end{itemize}
 \paragraph{v1.3.2 \textit{shop429}}
   \begin{itemize}
-  	\item
+    \item Implementazione del trasferimento come \textit{chunked} per sfruttare le potenzialit\`a dell'http (singola richiesta)
+  	\item Aggiunto controllo di checksum per il firmware ricevuto
+  \end{itemize}
+\paragraph{v1.3.3 \textit{shop429}}
+  \begin{itemize}
+  	\item Migliorata la gestione con costanti della flash
+    \item Corretta l'interpretazione della codifica chunked per resistere con dei firmware reali
   \end{itemize}
 \paragraph{v1.3.3 \textit{shop429}}
   \begin{itemize}
