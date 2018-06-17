@@ -2,7 +2,7 @@
 
 \subsection{Introduzione}
 
-Con questo firmware si vuole implementare una parte del progetto \textit{Alterline}, che mira a fornire un controllo remoto delle colorazioni delle vetrine di un negozio, con possibilit\`a di essere esteso con nuove funzionalit\`a e di essere il pi\`u possibile automatizzato nella diagnosi degli errori. All'interno del negozio ogni vetrina avr\`a un led RGB, controllato con PWM da una schedina STM32, ognuna di queste schede sar\`a in contatto bluetooth con una scheda centrale (per cui questo firmware \`e pensato), unica per ogni negozio, che sar\`a a sua volta connessa via ethernet ad un server web, contenente il database utilizzato nel progetto.
+Con questo firmware si vuole implementare una parte del progetto \textit{Alterline}, che mira a fornire un controllo remoto delle colorazioni delle vetrine di un negozio, con possibilit\`a di essere esteso con nuove funzionalit\`a e di essere il pi\`u possibile automatizzato nella diagnosi degli errori e nell'assistenza remota. All'interno del negozio ogni vetrina avr\`a un led RGB, controllato con PWM da una schedina STM32 (da definire se F401 o F072), ognuna di queste schede sar\`a in contatto bluetooth con una scheda centrale (per cui questo firmware \`e pensato), unica per ogni negozio, che sar\`a a sua volta connessa via ethernet ad un server web, contenente il database utilizzato nel progetto e i firmware per poter eseguire un aggiornamento OTA (Over The Air).
 
 Verranno utilizzati principalmente software e hardware prodotti dalla ST Microelectronics, azienda italo-francese specializzata nella produzione di dispositivi elettronici, principalmente utilizzati dello sviluppo di tecnologie embedded. STM32 \`e una famiglia di microcontrollori basati su processori ARM a 32 bit, la ST produce piattaforme hardware e software per poter sviluppare su questi dispositivi.
 
@@ -12,7 +12,7 @@ Questo specifico progetto \`e nato inizialmente per la singola gestione della co
 
 \textdesc{figura \ref{fig:boards}}
 
-Questo progetto mira a scrivere un firmware per la board \texttt{STM32F429ZI Nucleo}, una scheda di sviluppo fornita dalla STM e basata su processore ARM Cortex-M4. La board presenta 144 pin utilizzabili per collegare altre periferiche note (tra cui quelle che soddisfano le specifiche ST morpho e Arduino R3) ed \`e costruita per poter essere assemblata con altre board simili in una pila avente i pin comunicanti. Il SoC supporta diverse periferiche tra cui diversi bus SPI e una presa ethernet (il connettore \`e presente sulla board).
+Questo progetto mira a scrivere un firmware per la board \texttt{STM32F429ZI Nucleo}, una scheda di sviluppo fornita dalla STM e basata su processore ARM Cortex-M4, l'architettura presente \`e interamente a 32 bit. La board presenta 144 pin utilizzabili per collegare altre periferiche (tra cui quelle che soddisfano le specifiche ST morpho e Arduino R3) ed \`e costruita per poter essere assemblata con altre board simili in una pila avente i pin comunicanti. Il SoC supporta diverse periferiche tra cui diversi bus SPI e una presa ethernet (il connettore \`e presente sulla board).
 
 Per poter utilizzare la connettivit\`a bluetooth \`e necessario includere una estensione. In questo caso, \`e stata utilizzata la scheda \texttt{X-NUCLEO-IDB05A1}, un modulo che implementa la connettivit\`a BLE (Bluetooth Low Energy) e installabile sulle board di sviluppo STM32 utilizzando i connettori Arduino R3. A causa di sovrapposizione tra alcuni pin del processore, utilizzabili sia per ethernet che SPI, \`e stato necessario fare delle modifiche su entrambe le board per poterli spostare. Questo \`e stato facilmente ottenibile muovendo i relativi soulder bridge sulle schede.
 
@@ -102,6 +102,10 @@ Per poter aggiornare i dati delle tabelle o del negozio da questa scheda su serv
 All'interno degli script php per la gestione del database sono utilizzati dei prepared statement al posto di istruzioni tradizionali, con la spesa di qualche riga di codice in pi\`u, vengono prodotte istruzioni generali, alla quale vengono sostituiti i dati come variabili al momento dell'esecuzione. Questo in genere migliora notevolmente le prestazioni al livello del database, in quanto non \`e necessario un nuovo parsing ad ogni istruzione che differisce solo per valori numerici dalle precedenti (da valutare l'impatto reale su questa applicazione). Inoltre questo metodo protegge ulteriormente da sql injection in quanto i dati inseriti sono sempre numerici (non possono essere inseriti comandi maligni da input).
 
 \subsection{Gestione firmware e memoria}
+
+\subsubsection{Mappatura delle memorie}
+
+I dispositivi basati su processori Cortex-M* (come la board impiegata in questo progetto), vedono le varie memorie disponibili mappate all'interno dello stesso spazio di indirizzi, indipendentemente dalla loro tecnologia. In questo caso, il processore \`e in grado di indirizzare 4GB di memoria (da 0x00000000 a 0xFFFFFFFF, potendo utilizzare 32 bit) ma solo alcuni di questi sono effettivamente attivi. Nello specifico sulla board sono presenti nativamente una SRAM, allocata tra 0x20000000 e 0x20030000 (192k) utilizzata come ram principale, una CCRAM, allocata tra 0x10000000 e 0x10010000 (64k) al momento inutilizzata e la flash, allocata tra 0x08000000 e 0x0820000 (2M) utilizzata per contenere il firmware e tutti i dati che non devono essere volatili (e.g. perdersi con uno spegnimento).
 
 \subsubsection{Emulazione di una EEPROM su memoria flash}
 
