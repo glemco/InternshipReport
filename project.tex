@@ -127,12 +127,26 @@ Quando la board viene accesa (in condizioni normali), vengono eseguite le prime 
 
 \subsubsection{Funzionamento delle librerie}
 
-Le librerie per la gestione del BLE (Bluetooth Low Energy), utilizzano i servizi gap, per quanto riguarda l'apertura/chiusura della connessione, e gatt, per lettura/scrittura e altre funzionalit\`a. In entrambi i casi il paradigma utilizzato \`e quello callback, cos\`i le chiamate a funzione lanciano richieste all'estensione bluetooth e quando queste ricevono risposta, un interrupt viene generato e la funzione \texttt{HCI\_Event\_CB()} viene chiamata con argomento il puntatore all'evento (una struct che contiene i dati necessari), in base al tipo di tale evento viene eseguita l'azione corrispondente. 
+Le librerie per la gestione del BLE (Bluetooth Low Energy), utilizzano i servizi GAP (Generic Access Profile), per quanto riguarda l'apertura/chiusura della connessione, e GATT (Generic ATTribute profile), per lettura/scrittura e altre funzionalit\`a. In entrambi i casi il paradigma utilizzato \`e quello callback, cos\`i le chiamate a funzione lanciano richieste all'estensione bluetooth e quando queste ricevono risposta, un interrupt viene generato e la funzione \texttt{HCI\_Event\_CB()} viene chiamata con argomento il puntatore all'evento (una struct che contiene i dati necessari), in base al tipo di tale evento viene eseguita l'azione corrispondente. 
 Queste sorgenti sono fornite dalla ST come test per l'interfaccia BlueNRG utilizzando alcune delle schede a 64 pin, anche se l'estensione \`e compatibile in generale con i pin Arduino R3, quindi con qualche modifica \`e stato possibile effettuare un porting. 
 
 Gli standard gatt, consentono ai server di fornire i propri servizi sotto forma di caratteristiche, strutture dati logicamente omogenee all'interno di un servizio che a loro volta possono contenere una coppia propriet\`a/valore e dei descrittori. I client connessi sono in grado di leggere o scrivere all'interno di tali caratteristiche e cos\`i avvengono i passaggi di dati. Il client, in genere non conosce le varie caratteristiche presenti sul server, a tal proposito esiste una chiamata di discovery per poter appunto capire quali servizi (e caratteristiche) sono disponibili e come accedere ad esse. Il protocollo prevede che ogni caratteristica o servizio abbia un proprio UUID da 128 bit, che dovrebbe essere il pi\`u possibile unico, sono anche definiti degli UUID pi\`u brevi (16 o 32 bit) per quanto riguarda servizi predefiniti dallo standard. Ad ogni modo, quando il client viene a conoscenza dei vari UUID dei servizi accessibili, \`e in grado di accedervi attraverso degli indirizzi specifici sul server, detti handle. 
 
-All'interno di questa applicazione, non era necessaria tutta questa genericit\`a, il client \`e programmato per dialogare solamente con le vetrine, pu\`o dunque conoscere a priori la struttura dei servizi e accedervi direttamente attraverso gli handle che sono gi\`a conosciuti (evitando dunque tutta la procedura di discovery).
+In questa specifica applicazione, non era necessaria tutta questa genericit\`a, il client \`e programmato per dialogare solamente con le vetrine, pu\`o dunque conoscere a priori la struttura dei servizi e accedervi direttamente attraverso gli handle che sono gi\`a conosciuti (evitando dunque tutta la procedura di discovery).
+
+\begin{figure}[ht]
+  \center
+  \begin{subfigure}{.65\textwidth}
+    \includegraphics[width=\textwidth]{ble}
+    \caption{Architettura Bluetooth Low Energy}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{.25\textwidth}
+    \includegraphics[width=\textwidth]{gatt}
+    \caption{Struttura GATT}
+  \end{subfigure}
+  \caption{protocolli BLE}
+\end{figure}
 
 \subsubsection{Comunicazione come client BLE}
 
@@ -179,20 +193,33 @@ Le letture da socket (sul client) avvengono a blocchi grandi al massimo \texttt{
 
 Utilizzando questo metodo di codifica, non viene passato inizialmente l'header \texttt{Content-size}, per il client \`e dunque impossibile capire quando sar\`a arrivato l'ultimo chunk (il socket non andr\`a mai in EOF), il protocollo quindi prevede che al termine del download la connessione html venga chiusa, il client cio\`e ricever\`a un messaggio di \texttt{PEER\_CLOSE\_NOTIFY}. Alla ricezione vengono eseguiti i controlli di dimensione e checksum. Si procede sia facendo riferimento ai byte ricevuti e scritti che sommando i valori di chunk-size e si confrontano entrambi i risultati con un dato ricevuto dal server all'interno dell'header. In maniera analoga il checksum viene calcolato e confrontato con il valore ricevuto alla fine del firmware, calcolato sul server. Visto che il dato \`e calcolato sul momento questo non pu\`o essere incluso nell'header (non \`e ancora conosciuto in quel momento) e si utilizzano quindi gli ultimi 2 byte per contenere tale checksum in notazione big-endian. Per avere la certezza che tutti i byte siano correttamente scritti, visto che sulla flash vengono scritte solo parole intere (4 byte), viene aggiunto un padding di 3 byte vuoti (0xff) cos\`i da far rientrare anche gli ultimi byte spaiati nel firmware all'interno dell'ultima parola scritta in flash (con buona probabilit\`a un firmware non soffre di questo problema in quando le istruzioni sono generalmente contenute in word).
 
+\begin{figure}[ht]
+  \center
+  \begin{subfigure}{\textwidth}
+    \includegraphics[width=\textwidth]{https_tcp}
+    \caption{Apertura della connessione HTTPS-TCP}
+  \end{subfigure}
+  %\hfill
+  \caption{protocollo HTTPS}
+\end{figure}
+
+\newpage
+
 \subsection{Note}
 \begin{itemize}
 \item La comunicazione bluetooth viaggia in formato testuale, una possibile ottimizzazione pu\`o essere passare al binario, riducendo cos\`i la grandezza dei pacchetti e le istruzioni necessarie alla gestione. 
-\item La scrittura su server web \`e in po' pi\`u delicata perch\'e nello spedire uno stream binario nel pacchetto HTTP, \`e molto facile utilizzare caratteri particolari che invaliderebbero il parsing della query string. A tal proposito si pu\`o gestire il dato ricevuto come puro binario su pagine apposite (invece di utilizzare la stessa pagina e cambiare in base al valore di \texttt{mode}).
+\item La scrittura su server web \`e in po' pi\`u delicata perch\'e nello spedire uno stream binario nel pacchetto HTTP, \`e molto facile utilizzare caratteri particolari che invaliderebbero il parsing della query string. A tal proposito si pu\`o gestire il dato ricevuto come puro binario su pagine apposite (invece di utilizzare la stessa pagina e cambiare in base al valore di \texttt{\$\_REQUEST[mode]}).
 \item Bisogna prestare particolare attenzione alla configurazione del server HTTPS per garantire l'autenticazione col client, la board ha un supporto limitato di ciphersuite, una normale configurazione di apache con openssl dovrebbe funzionare. Il certificato pu\`o essere self-signed, in quel caso bisogna installare tutta la chain o anche solo la CA sul dispositivo, nel test \`e stato generato con chiave RSA ma dovrebbe essere supportata anche ECDSA.
 \item Utilizzando questi metodi di cifratura non \`e possibile leggere il contenuto del pacchetto da programmi come wireshark.
+\item Per la connessione HTTPS non vengono utilizzati certificati lato client in quanto non espressamente richiesto dallo standard, potrebbe essere un'ulteriore sicurezza per controllare gli accessi al server (in aggiunta al controllo della password)
 \item Indipendentemente dal metodo effettivamente implementato nel sistema, ogni stream binario all'interno di questa applicazione che prevede byte multipli, utilizza una notazione big-endian, dove i byte pi\`u significativi precedono quelli meno significativi (viene gestito tutto via software, perch\`o \`e indipendente dall'architettura), dunque una grandezza a 16 bit con valore \texttt{0xabcd} viene trasmessa separando i byte come \texttt{0xab} e \texttt{0xcd}, la notazione contraria (little-endian) viene invece utilizzata a livello di firmware.
 \item Le azioni r/w con ble, vengono gestite per singolo attributo e ognuno corrisponde ad un campo nella struct definita per le vetrine, per identificarla dall'esterno si usano le macro \texttt{FIELD\_*}, utilizzate anche come indici nell'array degli handle (\texttt{CH\_HANDLES[FIELD\_FOO]==FOO\_HANDLE}), per questa ragione \`e bene che vengano tenute in ordine, consecutive e che partano da 0.
 \item La sincronizzazione della data viene ripetuta ad ogni connessione, questo pu\`o essere cambiato in base alla modalit\`a (\texttt{active\_shop.status}) esattamente come l'ordine e la frequenza delle operazioni che vengono eseguite. Per fare ci\`o si devono modificare le funzioni \texttt{*\_Process} in \texttt{main.c}.
 \item Le variabili del database locale riguardanti le vetrine sono impostate a 0 sfruttando il fatto che la memoria allocata staticamente non pu\`o essere parzialmante inizializzata, dunque basta settare alcuni byte (in questo caso gli id dei primi 3 record, il loro valore \`e ininfluente) per avere il resto della struttura inizializzata automaticamente.
-\item Gli indirizzi virtuali per la eeprom sono definiti in \texttt{db\_struct.h}, l'indirizzo iniziale \`e del tutto arbitrario, da lì inizia il negozio, sono poi definiti i numeri di half-word necessari per contenere il negozio e ciascuna vetrina, con questi si compone l'indirizzo finale, dal quale si pu\`o capire lo spazio di indirizzi utilizzato.
-\item Nella flash i dati scritti devono essere allineati, il che vuol dire che possono essere scritte parole (32 bit), mezze parole e byte singoli, ma non è possibile scrivere una parola subito dopo un singolo byte, perch\`e il suo allineamento prevede un indirizzo di partenza multiplo di 4 (per questa ragione le flag di inizio partizione occupano un'intera parola anzi che un singolo bit).
+\item Gli indirizzi virtuali per la eeprom sono definiti in \texttt{db\_struct.h}, l'indirizzo iniziale \`e del tutto arbitrario, da l\`i inizia il negozio, sono poi definiti i numeri di half-word necessari per contenere il negozio e ciascuna vetrina, con questi si compone l'indirizzo finale, dal quale si pu\`o capire lo spazio di indirizzi utilizzato.
+\item Nella flash i dati scritti devono essere allineati, il che vuol dire che possono essere scritte parole (32 bit), mezze parole e byte singoli, ma non \`e possibile scrivere una parola subito dopo un singolo byte, perch\`e il suo allineamento prevede un indirizzo di partenza multiplo di 4 (per questa ragione le flag di inizio partizione occupano un'intera parola anzi che un singolo bit).
 \item Con l'utilizzo di stream binari nella comunicazione, non \`e pi\`u possibile utilizzare le funzioni legate alle stringhe, poich\'e il valore \texttt{'\textbackslash 0'} che termina le stringhe \`e un valore perfettamente lecito all'interno di un pacchetto binario e non ne determina dunque la fine.
 \item Le query string utilizzate per le richieste al server sono nella forma \texttt{mode=abc} per poter occupare una dimesione fissa di 8 bit, necessaria alla funzione che compone il pacchetto http e non sempre ricavabile con \texttt{strlen()} (vedi sopra).
-\item Per ridurre la grandezza dei pacchetti \`e possibile eliminare o accorciare alcuni header, che comunque non vengono interpretati dalla board. Ad esempio all'interno degli script php si pu\`o rimuovere l'header \texttt{X-Powered-By}, che contiene dati sull'interprete utilizzato. Attraverso le configurazioni del server apache invece, \`e possibile ridurre i dati presentati nell'header \texttt{Server} alla sola dicitura \textit{Apache} aggiungendo al file di configurazione (\texttt{httpd.conf}) la linea \texttt{ServerTokens Prod}.
+\item Per ridurre la grandezza dei pacchetti \`e possibile eliminare o accorciare alcuni header, che comunque non vengono interpretati dalla board. Ad esempio all'interno degli script php si pu\`o rimuovere l'header \texttt{X-Powered-By}, che contiene dati sull'interprete utilizzato (qui php). Attraverso le configurazioni del server apache invece, \`e possibile ridurre i dati presentati nell'header \texttt{Server} alla sola dicitura \textit{Apache} aggiungendo al file di configurazione (\texttt{httpd.conf}) la linea \texttt{ServerTokens Prod}.
 \item I nomi utente per i singoli negozi (necessari per accedere al database) vanno scelti con cautela, nel php il nome viene filtrato per estrapolarne un contenuto numerico e questo viene usato come id del negozio, deve dunque essere l'unico numero presente nel nome (in questa fase vengono usati nomi del tipo shopX)
 \end{itemize}
