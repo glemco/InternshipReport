@@ -9,10 +9,10 @@
 \usepackage{subcaption}
 \graphicspath{{./images/}}
 
-\title{Report di tirocinio}
+\title{Relazione di tirocinio}
 \author{Gabriele Monaco}
 
-\newcommand{\textdesc}[1]{\textsf{\color{teal}#1}}
+\newcommand{\textdesc}[1]{\hspace{5pt}\textsf{\color{teal}#1} \vspace{7pt}}
 
 \begin{document}
 
@@ -26,6 +26,7 @@
 
 \tableofcontents
 
+\setlength{\emergencystretch}{7pt}
 \setlength{\parindent}{0pt}
 
 \newpage
@@ -34,9 +35,11 @@
 
   \subsection{Note sulla relazione}
 
-  All'interno di questo report user\`o sempre la terza persona, nonostante ci\`o questa parte di progetto \`e stata tenuta da me, dunque le varie implementazioni (qualora non siano librerie o specifiche richieste del cliente) sono da considerarsi mie contribuzioni
+  All'interno di questa relazione user\`o sempre la terza persona, nonostante ci\`o questa parte di progetto \`e stata tenuta da me, dunque le varie implementazioni (qualora non siano librerie o specifiche richieste del cliente) sono da considerarsi mie contribuzioni
 
   Spesso per trattare di strutture dati, variabili o funzioni con parti del nome in comune, verranno usate alcune wildcards, ad esempio quando si parla di vetrine e negozio, le variabili \textup{\texttt{foo\_*}} saranno \textup{\texttt{foo\_vetrine}} e \textup{\texttt{foo\_shop}}, in maniera analoga dove questo pu\`o non essere facilmente deducibile vengono usati metodi del tipo \textup{\texttt{[foo/bar][Eth/Ble]}} che stanno ad indicare tutte le combinazioni possibili cambiando le parole tra le \textup{\texttt{[ ]}} (quindi in questo caso ci si riferisce a \textup{\texttt{fooEth}},\textup{\texttt{fooBle}},\textup{\texttt{barEth}},\textup{\texttt{barBle}}). In ogni caso queste notazioni vengono utilizzate per esprimere identificatori presenti nel codice, \`e dunque immediata la comprensione quando si ha accesso alla sorgente e comunque non viene preclusa la comprensione dei ragionamenti espressi in caso contrario.
+
+  Vengono utilizzate all'interno del documento (e del codice) abbreviazioni come \textup{\texttt{ETH}}, per riferirsi alla connessione che passa attraverso l'interfaccia ethernet e \textup{\texttt{BLE}}, che indica la connessione bluetooth (low energy). Inoltre le operazioni di lettura/scrittura vengono spesso abbreviate con le iniziali dall'inglese (\textup{\texttt{r/w}}).
 
   Questa relazione \`e stata pensata sia per documentare il lavoro svolto nell'ambito del tirocinio, che per spiegare al meglio a chi prender\`a in mano il codice come questo \`e stato pensato. Per ragioni aziendali il codice stesso non pu\`o essere distribuito e dunque non sar\`a incluso all'interno di questa relazione. Si cerca comunque di rendere pi\`u chiaro possibile il lavoro fatto anche senza l'accesso alle sorgenti.
 
