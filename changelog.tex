@@ -119,17 +119,24 @@
   \begin{itemize}
     \item Utilizzo di richieste separate al server per ottenere le varie sezioni del file
   \end{itemize}
-\paragraph{v1.3.2 \textit{shop429}}
+\paragraph{v1.3.3 \textit{shop429}}
   \begin{itemize}
     \item Implementazione del trasferimento come \textit{chunked} per sfruttare le potenzialit\`a dell'http (singola richiesta)
   	\item Aggiunto controllo di checksum per il firmware ricevuto
   \end{itemize}
-\paragraph{v1.3.3 \textit{shop429}}
+\paragraph{v1.3.4 \textit{shop429}}
   \begin{itemize}
   	\item Migliorata la gestione con costanti della flash
     \item Corretta l'interpretazione della codifica chunked per resistere con dei firmware reali
   \end{itemize}
-\paragraph{v1.3.3 \textit{shop429}}
+\paragraph{v1.3.5 \textit{shop429}}
   \begin{itemize}
-  	\item
+  	\item Modificato il linker script e l'offset della vector table per consentire l'esecuzione da bootloader
+    \item Configurato il reset quando il pacchetto di update \`e stato ricevuto
+    \item Implementato il download del firmware per le vetrine
+  \end{itemize}
+\paragraph{v1.3.6 \textit{shop429}}
+  \begin{itemize}
+  	\item Impostati valori dello stato del negozio per forzare il download e/o l'installazione di un firmware
+    \item Implementato il servizio per caricare il firmware sulle vetrine attraverso il bluetooth
   \end{itemize}
