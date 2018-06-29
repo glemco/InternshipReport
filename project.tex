@@ -1,6 +1,6 @@
-\subsection{Introduzione}
+\subsection{Introduzione al progetto}
 
-Con questo firmware si vuole implementare una parte del progetto \textit{Foo} (il vero nome non pu\`o essere reso pubblico), che mira a fornire un controllo remoto per le colorazioni delle vetrine di un negozio (o una catena di negozi), con possibilit\`a di essere esteso con nuove funzionalit\`a e di essere il pi\`u possibile automatizzato nella diagnosi degli errori e nell'assistenza remota. All'interno del negozio ogni vetrina avr\`a un led RGB, controllato con \textit{PWM} da una schedina \textit{STM32} (da definire se \textit{F401} o \textit{F072}), ognuna di queste schede sar\`a in contatto bluetooth con una scheda centrale (per cui questo firmware \`e pensato), unica per ogni negozio, che sar\`a a sua volta connessa via ethernet ad un server web, contenente il database utilizzato nel progetto e i firmware per poter eseguire un aggiornamento \textit{OTA} (Over The Air). Un operatore con accesso al server (attraverso credenziali), sar\`a in grado di gestire le vetrine all'interno del proprio negozio e un amministratore sar\`a in grado di accedere a tutte le vetrine presenti (immaginate come vetrine delle varie filiali).
+Con questo firmware (scritto in C) si vuole implementare una parte del progetto \textit{Foo} (il vero nome non pu\`o essere reso pubblico), che mira a fornire un controllo remoto per le colorazioni delle vetrine di un negozio (o una catena di negozi), con possibilit\`a di essere esteso con nuove funzionalit\`a e di essere il pi\`u possibile automatizzato nella diagnosi degli errori e nell'assistenza remota. All'interno del negozio ogni vetrina avr\`a un led RGB, controllato con \textit{PWM} da una schedina \textit{STM32} (da definire se \textit{F401} o \textit{F072}), ognuna di queste schede sar\`a in contatto bluetooth con una scheda centrale (per cui questo firmware \`e pensato), unica per ogni negozio, che sar\`a a sua volta connessa via ethernet ad un server web, contenente il database utilizzato nel progetto e i firmware per poter eseguire un aggiornamento \textit{OTA} (Over The Air). Un operatore con accesso al server (attraverso credenziali), sar\`a in grado di gestire le vetrine all'interno del proprio negozio e un amministratore sar\`a in grado di accedere a tutte le vetrine presenti (immaginate come vetrine delle varie filiali).
 
 Verranno utilizzati principalmente software e hardware prodotti dalla \textit{ST Microelectronics}, azienda italo-francese specializzata nella produzione di dispositivi elettronici, essenzialmente utilizzati nello sviluppo di tecnologie embedded. \textit{STM32} \`e una famiglia di microcontrollori basati su processori \textit{ARM} a 32 bit, la \textit{ST} produce piattaforme hardware e software per poter sviluppare su questi dispositivi.
 
@@ -159,6 +159,7 @@ Di norma un firmware contiene nella prima word (4 byte) la cosiddetta \textit{ve
 A questo punto l'eseguibile dovr\`a essere programmato all'indirizzo corretto (con \textit{STM32Programmer} o via \textit{OTA}), anche se \`e ancora possibile la programmazione attraverso la toolchain Atollic, in quanto l'eseguibile elf contiene le informazioni su dove deve essere \textit{flashato}. Non sar\`a dunque possibile il debug dal progetto del \textit{bootloader} (contiene solo la propria sorgente), ma sar\`a perfettamente funzionale utilizzando quello dell'applicativo.
 
 \begin{figure}[ht]
+  \vspace{15pt}
   \center
   \begin{subfigure}{.45\textwidth}
     \includegraphics[width=\textwidth]{flash}
@@ -187,13 +188,14 @@ Gli standard gatt, consentono ai server di fornire i propri servizi sotto forma 
 In questa specifica applicazione, non era necessaria tutta questa genericit\`a, il client \`e programmato per dialogare solamente con le vetrine, pu\`o dunque conoscere a priori la struttura dei servizi e accedervi direttamente attraverso gli \textit{handle} che sono gi\`a conosciuti (evitando dunque tutta la procedura di \textit{discovery}).
 
 \begin{figure}[ht]
+  \vspace{10pt}
   \center
   \begin{subfigure}{.65\textwidth}
     \includegraphics[width=\textwidth]{ble}
     \caption{Architettura Bluetooth Low Energy}
   \end{subfigure}
   \hfill
-  \begin{subfigure}{.25\textwidth}
+  \begin{subfigure}{.30\textwidth}
     \includegraphics[width=\textwidth]{gatt}
     \caption{Struttura GATT}
   \end{subfigure}

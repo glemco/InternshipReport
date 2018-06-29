@@ -1,21 +1,29 @@
 \documentclass[a4paper,12pt]{article}
 
-\usepackage[left=1.5cm,right=1.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage[left=1.5cm,right=1.5cm,top=2.3cm,bottom=2.3cm]{geometry}
 \usepackage[italian]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{helvet}
 \usepackage[hidelinks]{hyperref}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{titling}
 \usepackage{subcaption}
 \graphicspath{{./images/}}
 
 \title{\textbf{Relazione di tirocinio}}
 \author{Gabriele Monaco}
 
-\newcommand{\textdesc}[1]{\hspace{5pt}\textsf{\color{gray}#1} \vspace{7pt}}
+\newcommand{\textdesc}[1]{\hspace{5pt}\textsf{\footnotesize\color{gray}#1} \vspace{7pt}}
 
 \begin{document}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\thetitle}
+\rhead{\theauthor}
+\cfoot{\thepage}
 
 \maketitle
 
@@ -27,10 +35,15 @@
 
 \tableofcontents
 
+\newpage
+
 \setlength{\emergencystretch}{15pt}
 \setlength{\parindent}{0pt}
+\renewcommand{\headrulewidth}{1sp}
 
-\newpage
+\section{\textsc{Prefazione}}
+
+Questo documento \`e stato steso per descrivere il lavoro svolto nell'ambito del tirocinio curricolare (12 CFU) inserito come corso opzionale nella laurea triennale in \textit{Computer Engineering} al Politecnico di Torino. Il tirocinio \`e stato svolto presso \textit{ESDA s.n.c.}, azienda di Orbassano (TO) che si occupa di progettazione hardware e software. Nello specifico l'azienda offre servizi come il design e la realizzazione di dispositivi elettronici e lo sviluppo software e firmware in ambiti quali l'automazione, la meccanica e l'informatica. Nel mio caso, sono stato designato allo sviluppo di software all'interno di un progetto di \textit{IoT}.
 
 \begin{em}
 
@@ -38,24 +51,36 @@
 
   All'interno di questa relazione user\`o sempre la terza persona, nonostante ci\`o questa parte di progetto \`e stata tenuta da me, dunque le varie implementazioni (qualora non siano librerie o specifiche richieste del cliente) sono da considerarsi mie contribuzioni
 
-  Spesso per trattare di strutture dati, variabili o funzioni con parti del nome in comune, verranno usate alcune wildcards, ad esempio quando si parla di vetrine e negozio, le variabili \textup{\texttt{foo\_*}} saranno \textup{\texttt{foo\_vetrine}} e \textup{\texttt{foo\_shop}}, in maniera analoga dove questo pu\`o non essere facilmente deducibile vengono usati metodi del tipo \textup{\texttt{[foo/bar][Eth/Ble]}} che stanno ad indicare tutte le combinazioni possibili cambiando le parole tra le \textup{\texttt{[ ]}} (quindi in questo caso ci si riferisce a \textup{\texttt{fooEth}},\textup{\texttt{fooBle}},\textup{\texttt{barEth}},\textup{\texttt{barBle}}). In ogni caso queste notazioni vengono utilizzate per esprimere identificatori presenti nel codice, \`e dunque immediata la comprensione quando si ha accesso alla sorgente e comunque non viene preclusa la comprensione dei ragionamenti espressi in caso contrario.
+  Spesso per trattare di strutture dati, variabili o funzioni con parti del nome in comune, verranno usate alcune \textup{wildcards}, ad esempio quando si parla di vetrine e negozio, le variabili \textup{\texttt{foo\_*}} saranno \textup{\texttt{foo\_vetrine}} e \textup{\texttt{foo\_shop}}, in maniera analoga dove questo pu\`o non essere facilmente deducibile vengono usati metodi del tipo \textup{\texttt{[foo/bar][Eth/Ble]}} che stanno ad indicare tutte le combinazioni possibili cambiando le parole tra le \textup{\texttt{[ ]}} (quindi in questo caso ci si riferisce a \textup{\texttt{fooEth}},\textup{\texttt{fooBle}},\textup{\texttt{barEth}},\textup{\texttt{barBle}}). In ogni caso queste notazioni vengono utilizzate per esprimere identificatori presenti nel codice, \`e dunque immediata la comprensione quando si ha accesso alla sorgente e comunque non viene preclusa la comprensione dei ragionamenti espressi in caso contrario.
 
   Vengono utilizzate all'interno del documento (e del codice) abbreviazioni come \textup{\texttt{ETH}}, per riferirsi alla connessione che passa attraverso l'interfaccia ethernet e \textup{\texttt{BLE}}, che indica la connessione bluetooth (low energy). Inoltre le operazioni di lettura/scrittura vengono spesso abbreviate con le iniziali dall'inglese (\textup{\texttt{r/w}}).
 
-  Questa relazione \`e stata pensata sia per documentare il lavoro svolto nell'ambito del tirocinio, che per spiegare al meglio a chi prender\`a in mano il codice come questo \`e stato pensato. Per ragioni aziendali il codice stesso non pu\`o essere distribuito e dunque non sar\`a incluso all'interno di questa relazione. Si cerca comunque di rendere pi\`u chiaro possibile il lavoro fatto anche senza l'accesso alle sorgenti.
+  Questa relazione \`e stata pensata sia per documentare il lavoro svolto nell'ambito del tirocinio, che per spiegare al meglio a chi prender\`a in mano il codice come questo \`e stato pensato. Per ragioni aziendali il codice stesso non pu\`o essere distribuito e dunque non sar\`a incluso all'interno di questa relazione. Si cerca comunque di rendere pi\`u chiaro possibile il lavoro svolto anche senza l'accesso alle sorgenti.
 
-  Nella sezione Note sono riportate alcune notazioni importanti utili per comprendere alcune scelte all'interno del codice o per capire quali scelte non possono essere prese sviluppando il progetto. Sono principalmente intese per chi lavora sul progetto anche se possono dare strumenti in pi\`u per comprendere alcuni problemi riscontrati durante la fase di sviluppo.
+  Nella sezione \textup{Note} sono riportate alcune notazioni importanti, utili per comprendere alcune scelte all'interno del codice o per capire quali scelte non possono essere prese sviluppando il progetto. Sono principalmente intese per chi lavora sul progetto anche se possono dare strumenti in pi\`u per comprendere alcuni problemi riscontrati durante la fase di sviluppo.
 
 \end{em}
 
-\section{GESTIONE NEGOZIO CON STM32F429ZI}
+\newpage
+
+\section{\textsc{Gestione Negozio con STM32F429ZI}}
 
 \input{project.tex}
 
 \newpage
 
-\section{CHANGELOG DEI PROGETTI}
+\section{\textsc{Changelog dei Progetti}}
 
 \input{./changelog.tex}
+
+\newpage
+
+\section{\textsc{Conclusione}}
+
+Durante questo tirocinio ho avuto modo di mettere in pratica diverse conoscenze accumulate durante gli anni precedenti, da quelle acquisite nei corsi del Politecnico ad altre imparate autonomamente. Questa esperienza \`e comunque stata molto formativa, in universit\`a ho imparato ad utilizzare il linguaggio C, anche ad un livello avanzato, ma non avevo quasi mai, prima d'ora, impiegato tali conoscenze in un ambiente embedded. Nelle mie esperienze precedenti, ho sempre programmato al di sopra di un sistema operativo, in grado di fornire direttamente le giuste risposte alle varie chiamate e in grado di implementare nativamente diverse funzionalit\`a. In questo caso la situazione era ben diversa perch\'e l'unico programma eseguito dal microcontrollore \`e il firmware, che deve essere aggiustato a dovere per contenere tutte le funzionalit\`a richieste, comunque tenendo conto che le risorse possono essere limitate e il codice non espressamente necessario ne consuma inutilmente. Buona parte della procedura, almeno per quanto riguarda l'inizializzazione dell'hardware e l'integrazione della maggior parte dei \textit{middleware}, era gestita automaticamente dagli strumenti usati per lo sviluppo, nonostante ci\`o, per avere un sistema che soddisfa i requisiti, \`e sempre necessario \textit{sporcarsi le mani}.
+
+Ho trovato molto interessante l'ambito di sviluppo dell'\textit{IoT} (Internet of Things), perch\'e consente di spaziare in diversi paradigmi di programmazione e diversi ambienti, mantenendo comunque una perfetta integrazione tra le varie parti che, seppur non siano omogenee, devono lavorare per un unico obiettivo. Ad esempio in questo progetto ho scritto il firmware per un microcontrollore, ma tale dispositivo doveva comunicare in rete, dunque oltre a rendere funzionali le sue interfacce di comunicazione, \`e stato necessario pensare all'implementazione di un protocollo per potersi passare i dati. In questa maniera ho anche dovuto implementare (a livello di test) gli applicativi lato server per consentire una corretta comunicazione con il dispositivo. Cos\`i ho potuto toccare con mano sia un ambiente a basso livello (il firmware in C per un dispositivo embedded) che uno ad alto livello (gli script php e il database su un server apache) e ho fatto in modo che le due parti fossero in grado di relazionarsi l'una con l'altra.
+
+Un altro fattore che sicuramente ha arricchito la mia esperienza \`e stato indubbiamente il lavoro di squadra, strumento che in genere non viene molto sfruttato durante gli anni della formazione, ma che sicuramente \`e un punto di forza in ambito lavorativo. Nello specifico un collega si \`e dovuto occupare del firmware per i dispositivi bluetooth e l'ambiente prevedeva che questi dispositivi interagissero con quello programmato da me. A questo punto \`e stato fondamentale coordinarsi sui metodi di implementazione, in maniera tale da scrivere codice il pi\`u possibile compatibile, in modo che la comunicazione fosse realmente efficace. Inoltre tutto il software scritto \`e stato altamente documentato, in quanto dopo la fine del mio tirocinio, sar\`a continuato da qualcun altro ed \`e importante che possa essere utilizzato al meglio. Per questa ragione \`e importante che tutte le scelte fatte siano chiare all'interno della squadra di sviluppo, in modo da continuare omogeneamente il lavoro e non ripetere passaggi che sono gi\`a stati implementati in altre sezioni del codice.
 
 \end{document}
