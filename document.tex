@@ -25,11 +25,19 @@
 \rhead{\theauthor}
 \cfoot{\thepage}
 
+\fancypagestyle{first}{
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0sp}
+  \rfoot{This document was made with \LaTeX}
+}
+
 \maketitle
 
 \begin{figure}[h]
   \includegraphics[width=\textwidth]{header}
 \end{figure}
+
+\thispagestyle{first}
 
 \newpage
 
@@ -43,7 +51,7 @@
 
 \section{\textsc{Prefazione}}
 
-Questo documento \`e stato steso per descrivere il lavoro svolto nell'ambito del tirocinio curricolare (12 CFU) inserito come corso opzionale nella laurea triennale in \textit{Computer Engineering} al Politecnico di Torino. Il tirocinio \`e stato svolto presso \textit{ESDA s.n.c.}, azienda di Orbassano (TO) che si occupa di progettazione hardware e software. Nello specifico l'azienda offre servizi come il design e la realizzazione di dispositivi elettronici e lo sviluppo software e firmware in ambiti quali l'automazione, la meccanica e l'informatica. Nel mio caso, sono stato designato allo sviluppo di software all'interno di un progetto di \textit{IoT}.
+Questo documento \`e stato redatto per descrivere il lavoro svolto nell'ambito del tirocinio curricolare (12 CFU) inserito come corso opzionale nella laurea triennale in \textit{Computer Engineering} al Politecnico di Torino. Il tirocinio \`e stato svolto presso \textit{ESDA s.n.c.}, azienda di Orbassano (TO) che si occupa di progettazione hardware e software. Nello specifico l'azienda offre servizi come il design e la realizzazione di dispositivi elettronici e lo sviluppo software e firmware in ambiti quali l'automazione, la meccanica e l'informatica. In questa esperienza, sono stato designato allo sviluppo di software all'interno di un progetto di \textit{IoT}.
 
 \begin{em}
 
